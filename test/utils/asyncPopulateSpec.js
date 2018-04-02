@@ -30,6 +30,7 @@ describe('asyncPopulate', function () {
       str: 'hello',
       date: new Date,
       foo: new Foo,
+      undefinedValue: undefined,
       funcs: {
         sync: () => 'shouldHaveThisValue',
         /* eslint-disable arrow-parens */
@@ -66,6 +67,7 @@ describe('asyncPopulate', function () {
       str: 'hello',
       date: source.date,
       foo: source.foo,
+      undefinedValue: undefined,
       funcs: {
         sync: 'shouldHaveThisValue',
         async: 'shouldHaveResolvedValue',

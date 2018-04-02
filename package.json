@@ -75,7 +75,7 @@
     "sequelize": "^3.24.0",
     "should": "^6.0.3",
     "sinon": "^2.0.0-pre",
-    "sinon-chai": "https://github.com/sjmulder/sinon-chai.git#pr/sinon-2.0.0-pre",
+    "sinon-chai": "^2.14.0",
     "sqlite3": "^3.1.4"
   },
   "scripts": {
