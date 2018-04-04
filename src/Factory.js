@@ -99,14 +99,12 @@ export default class Factory {
     const attrs = await this.attrsMany(num, attrsArray, buildOptionsArray);
     const models = [];
     for (let i = 0; i < attrs.length; ++i) {
-      models.push(await adapter.build(this.Model, attrs[i]));
-    }
-
-    if (this.options.afterBuild && buildCallbacks) {
-      for (let i = 0; i < models.length; ++i) {
-        models[i] = await this.options.afterBuild(
-          models[i], attrsArray, buildOptionsArray);
+      let buildModel = await adapter.build(this.Model, attrs[i]);
+      if (this.options.afterBuild && buildCallbacks) {
+        buildModel = await this.options.afterBuild(
+          buildModel, attrsArray, buildOptionsArray);
       }
+      models.push(buildModel);
     }
     return models;
   }
@@ -122,16 +120,13 @@ export default class Factory {
     );
     const savedModels = [];
     for (let i = 0; i < models.length; ++i) {
-      savedModels.push(await adapter.save(models[i], this.Model));
-    }
-
-    if (this.options.afterCreate) {
-      for (let i = 0; i < savedModels.length; ++i) {
-        savedModels[i] = await this.options.afterCreate(
-          savedModels[i], attrsArray, buildOptionsArray);
+      let savedModel = await adapter.save(models[i], this.Model);
+      if (this.options.afterCreate) {
+        savedModel = await this.options.afterCreate(
+          savedModel, attrsArray, buildOptionsArray);
       }
+      savedModels.push(savedModel);
     }
-
     return savedModels;
   }
 }
