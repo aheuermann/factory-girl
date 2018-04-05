@@ -1,8 +1,8 @@
 {
-  "name": "factory-girl",
+  "name": "factory-girl-sync",
   "main": "index.js",
   "version": "5.0.1",
-  "homepage": "https://github.com/aexmachina/factory-girl",
+  "homepage": "https://github.com/aheuermann/factory-girl-sync",
   "authors": [
     "aexmachina"
   ],
