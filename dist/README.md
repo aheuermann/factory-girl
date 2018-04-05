@@ -1,18 +1,18 @@
-# factory-girl
+# factory-girl-sync
 
-[![Build Status](https://travis-ci.org/aexmachina/factory-girl.png)](https://travis-ci.org/aexmachina/factory-girl)
+[![Build Status](https://travis-ci.org/aheuermann/factory-girl-sync.png)](https://travis-ci.org/aheuermann/factory-girl-sync)
 
-`factory-girl` is a factory library for [Node.js](http://nodejs.org/) and the browser that is inspired by [Factory\_girl](http://github.com/thoughtbot/factory_girl). It works asynchronously and supports associations and the use of functions for generating attributes.
+`factory-girl-sync` is a fork of [Factory\_girl](http://github.com/aexmachina/factory_girl) that runs synchronously.
 
 ## Installation
 
 Node.js:
 
 ```bash
-npm install factory-girl
+npm install factory-girl-sync
 ```
 
-To use `factory-girl` in the browser or other JavaScript environments, there are
+To use `factory-girl-sync` in the browser or other JavaScript environments, there are
 builds for numerous module systems in the `dist/` directory.
 
 ## Usage
@@ -23,7 +23,7 @@ user factory.
 Here's the crash course:
 
 ```javascript
-const factory = require('factory-girl').factory;
+const factory = require('factory-girl-sync').factory;
 const User    = require('../models/user');
 
 factory.define('user', User, {
@@ -153,7 +153,7 @@ factory.build('expiredUser').then(user => {
 
 ### `#extend(parent, name, initializer, options = {})`
 
-The `#extend` method takes the same options as `#define` except you 
+The `#extend` method takes the same options as `#define` except you
 can provide a different `Model` using `options.model`.
 
 ## Using Factories
@@ -250,7 +250,7 @@ specific models, or as the 'default adapter', which is used for any models for w
 adapter has not been specified. See the adapter docs for usage, but typical usage is:
 
 ```javascript
-const FactoryGirl = require('factory-girl');
+const FactoryGirl = require('factory-girl-sync');
 const factory = FactoryGirl.factory;
 const adapter = new FactoryGirl.MongooseAdapter();
 
