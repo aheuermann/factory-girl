@@ -1,8 +1,8 @@
 # factory-girl-sync
 
-[![Build Status](https://travis-ci.org/aheuermann/factory-girl-sync.png)](https://travis-ci.org/aheuermann/factory-girl-sync)
+[![Build Status](https://travis-ci.org/aheuermann/factory-girl-sync.svg?branch=master)](https://travis-ci.org/aheuermann/factory-girl-sync)
 
-`factory-girl-sync` is a fork of [Factory\_girl](http://github.com/aexmachina/factory_girl) that runs synchronously.
+`factory-girl-sync` is a fork of [Factory\_girl](http://github.com/aexmachina/factory_girl) that creates models synchronously.
 
 ## Installation
 
