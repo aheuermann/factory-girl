@@ -4,9 +4,10 @@
   "main": "./src/index",
   "author": [
     "@aexmachina",
-    "@chetanism"
+    "@chetanism",
+    "@aheuermann"
   ],
-  "version": "6.1.0",
+  "version": "7.0.0",
   "keywords": [
     "factory",
     "test",

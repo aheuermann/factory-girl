@@ -1,3 +1,8 @@
+## v7.0.0
+
+- Refactored code internally so that `buildMany` and `createMany` call `build` and `create` respectively. Also, attrs
+  and buildOptions are shallow copied so that each call to `attrs` gets it's own copy.
+
 ## v6.1.0
 
 - Added a `beforeCreate` method that is called before the model is saved.
