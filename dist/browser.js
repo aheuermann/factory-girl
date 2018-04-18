@@ -12879,7 +12879,7 @@ var Factory = function () {
 
         var attrs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var buildOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-        var model;
+        var buildModel, beforeCreate;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -12888,12 +12888,15 @@ var Factory = function () {
                 return this.build(adapter, attrs, buildOptions);
 
               case 2:
-                model = _context3.sent;
-                return _context3.abrupt('return', adapter.save(model, this.Model).then(function (savedModel) {
+                buildModel = _context3.sent;
+                beforeCreate = this.options.beforeCreate ? this.options.beforeCreate(buildModel, attrs, buildOptions) : buildModel;
+                return _context3.abrupt('return', _promise2.default.resolve(beforeCreate).then(function (model) {
+                  return adapter.save(model, _this.Model);
+                }).then(function (savedModel) {
                   return _this.options.afterCreate ? _this.options.afterCreate(savedModel, attrs, buildOptions) : savedModel;
                 }));
 
-              case 4:
+              case 5:
               case 'end':
                 return _context3.stop();
             }
