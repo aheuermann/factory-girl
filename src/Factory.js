@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import asyncPopulate from './utils/asyncPopulate';
 
 export default class Factory {
@@ -45,19 +46,20 @@ export default class Factory {
     return modelAttrs;
   }
 
-  async build(adapter, extraAttrs = {}, buildOptions = {}) {
+  async build(adapter, extraAttrs = {}, buildOptions = {}, buildCallbacks = true) {
     const modelAttrs = await this.attrs(extraAttrs, buildOptions);
     const model = adapter.build(this.Model, modelAttrs);
-    return this.options.afterBuild ?
-        this.options.afterBuild(model, extraAttrs, buildOptions) :
-        model;
+    if (!this.options.afterBuild || !buildCallbacks) {
+      return Promise.resolve(model);
+    }
+    return this.options.afterBuild(model, extraAttrs, buildOptions);
   }
 
-  async create(adapter, attrs = {}, buildOptions = {}) {
-    const buildModel = await this.build(adapter, attrs, buildOptions);
+  async create(adapter, attrs = {}, buildOptions = {}, buildCallbacks = true) {
+    const buildModel = await this.build(adapter, attrs, buildOptions, buildCallbacks);
+
     const beforeCreate = this.options.beforeCreate ?
       this.options.beforeCreate(buildModel, attrs, buildOptions) : buildModel;
-
     return Promise.resolve(beforeCreate)
       .then(model => adapter.save(model, this.Model))
       .then(savedModel => (this.options.afterCreate ?
@@ -66,71 +68,100 @@ export default class Factory {
       ));
   }
 
-  async attrsMany(num, attrsArray = [], buildOptionsArray = []) {
-    let attrObject = null;
-    let buildOptionsObject = null;
+  async attrsMany(numArg, attrsArrayArg = [], buildOptionsArrayArg = []) {
+    const {
+      num,
+      attrsArray,
+      buildOptionsArray,
+    } = await parseAndValidateManyArgs(numArg, attrsArrayArg, buildOptionsArrayArg);
 
-    if (typeof attrsArray === 'object' && !Array.isArray(attrsArray)) {
-      attrObject = attrsArray;
-      attrsArray = [];
-    }
-    if (typeof buildOptionsArray === 'object' && !Array.isArray(buildOptionsArray)) {
-      buildOptionsObject = buildOptionsArray;
-      buildOptionsArray = [];
-    }
-    if (typeof num !== 'number' || num < 1) {
-      return Promise.reject(new Error('Invalid number of objects requested'));
-    }
-    if (!Array.isArray(attrsArray)) {
-      return Promise.reject(new Error('Invalid attrsArray passed'));
-    }
-    if (!Array.isArray(buildOptionsArray)) {
-      return Promise.reject(new Error('Invalid buildOptionsArray passed'));
-    }
-    attrsArray.length = buildOptionsArray.length = num;
     const models = [];
     for (let i = 0; i < num; i++) {
-      models[i] = await this.attrs(
-        attrObject || attrsArray[i] || {},
-        buildOptionsObject || buildOptionsArray[i] || {}
+      models.push(await this.attrs(attrsArray[i], buildOptionsArray[i]));
+    }
+    return models;
+  }
+
+  async buildMany(adapter, numArg, attrsArrayArg = [], buildOptionsArrayArg = [],
+      buildCallbacks = true) {
+    const {
+      num,
+      attrsArray,
+      buildOptionsArray,
+    } = await parseAndValidateManyArgs(numArg, attrsArrayArg, buildOptionsArrayArg);
+
+    const models = [];
+    for (let i = 0; i < num; ++i) {
+      models.push(
+        await this.build(adapter, attrsArray[i], buildOptionsArray[i], buildCallbacks),
       );
     }
     return models;
   }
 
-  async buildMany(adapter, num, attrsArray = [], buildOptionsArray = [],
-      buildCallbacks = true) {
-    const attrs = await this.attrsMany(num, attrsArray, buildOptionsArray);
+  async createMany(adapter, numArg, attrsArrayArg = [], buildOptionsArrayArg = [],
+                   buildCallbacks = true) {
+    const {
+      num,
+      attrsArray,
+      buildOptionsArray,
+    } = await parseAndValidateManyArgs(numArg, attrsArrayArg, buildOptionsArrayArg);
+
     const models = [];
-    for (let i = 0; i < attrs.length; ++i) {
-      let buildModel = await adapter.build(this.Model, attrs[i]);
-      if (this.options.afterBuild && buildCallbacks) {
-        buildModel = await this.options.afterBuild(
-          buildModel, attrsArray, buildOptionsArray);
-      }
-      models.push(buildModel);
+    for (let i = 0; i < num; ++i) {
+      models.push(
+        await this.create(adapter, attrsArray[i], buildOptionsArray[i],
+          buildCallbacks),
+      );
     }
     return models;
   }
+}
 
-  async createMany(adapter, num, attrsArray = [], buildOptionsArray = []) {
-    if (Array.isArray(num)) {
-      buildOptionsArray = attrsArray;
-      attrsArray = num;
-      num = attrsArray.length;
-    }
-    const models = await this.buildMany(
-      adapter, num, attrsArray, buildOptionsArray
-    );
-    const savedModels = [];
-    for (let i = 0; i < models.length; ++i) {
-      let savedModel = await adapter.save(models[i], this.Model);
-      if (this.options.afterCreate) {
-        savedModel = await this.options.afterCreate(
-          savedModel, attrsArray, buildOptionsArray);
-      }
-      savedModels.push(savedModel);
-    }
-    return savedModels;
+async function parseAndValidateManyArgs(num, attrsArray = {}, buildOptionsArray = {}) {
+  if (Array.isArray(num)) {
+    buildOptionsArray = attrsArray;
+    attrsArray = num;
+    num = attrsArray.length;
   }
+  if (!attrsArray || attrsArray.length === 0) {
+    attrsArray = {};
+  }
+  if ((typeof attrsArray === 'object' && !Array.isArray(attrsArray))) {
+    attrsArray = createArrayOfObjects(num, attrsArray || {});
+  }
+  if (attrsArray.length !== num) {
+    throw new Error('attrs argument should be an object or an array equal to the ' +
+      'amount of objects being built or created. You passed  ' +
+      `attrs.length = ${attrsArray.length}. It should be ${num}`);
+  }
+  if (!buildOptionsArray || buildOptionsArray.length === 0) {
+    buildOptionsArray = {};
+  }
+  if ((typeof buildOptionsArray === 'object' && !Array.isArray(buildOptionsArray))) {
+    buildOptionsArray = createArrayOfObjects(num, buildOptionsArray || {});
+  }
+  if (buildOptionsArray.length !== num) {
+    throw new Error('buildOptions argument should be an object or an array equal to ' +
+      'the amount of objects being built or created. You passed  ' +
+      `buildOptions.length = ${buildOptionsArray.length}. It should be ${num}`);
+  }
+  if (typeof num !== 'number' || num < 1) {
+    throw new Error('Invalid number of objects requested');
+  }
+  if (!Array.isArray(attrsArray)) {
+    throw new Error('Invalid attrsArray passed');
+  }
+  if (!Array.isArray(buildOptionsArray)) {
+    throw new Error('Invalid buildOptionsArray passed');
+  }
+  return { num, attrsArray, buildOptionsArray };
+}
+
+function createArrayOfObjects(num, obj) {
+  const arr = [];
+  for (let i = 0; i < num; ++i) {
+    arr.push(Object.assign({}, obj));
+  }
+  return arr;
 }

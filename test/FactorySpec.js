@@ -349,15 +349,16 @@ describe('Factory', function () {
       return expect(modelsP).to.be.eventually.fulfilled;
     });
 
-    it('calls attrsMany to get model attrs', asyncFunction(async function () {
-      const spy = sinon.spy(objFactory, 'attrsMany');
+    it('calls attrs to get model attrs', asyncFunction(async function () {
+      const spy = sinon.spy(objFactory, 'attrs');
       const dummyAttrs = {};
       const dummyBuildOptions = {};
       await objFactory.buildMany(
         dummyAdapter, 5, dummyAttrs, dummyBuildOptions
       );
-      expect(spy).to.have.been.calledWith(5, dummyAttrs, dummyBuildOptions);
-      objFactory.attrsMany.restore();
+      expect(spy).to.have.callCount(5);
+      expect(spy).to.have.been.calledWith(dummyAttrs, dummyBuildOptions);
+      objFactory.attrs.restore();
     }));
 
     it('calls build on adapter with Model and each model attrs',
@@ -426,17 +427,18 @@ describe('Factory', function () {
       return expect(modelsP).to.be.eventually.fulfilled;
     });
 
-    it('calls buildMany to build models', asyncFunction(async function () {
-      const spy = sinon.spy(objFactory, 'buildMany');
+    it('calls build to build models', asyncFunction(async function () {
+      const spy = sinon.spy(objFactory, 'build');
       const dummyAttrs = {};
       const dummyBuildOptions = {};
       await objFactory.createMany(
         dummyAdapter, 5, dummyAttrs, dummyBuildOptions
       );
+      expect(spy).to.have.callCount(5);
       expect(spy).to.have.been.calledWith(
-        dummyAdapter, 5, dummyAttrs, dummyBuildOptions
+        dummyAdapter, dummyAttrs, dummyBuildOptions
       );
-      objFactory.buildMany.restore();
+      objFactory.build.restore();
     }));
 
     it('calls save on adapter with Model and each model',
@@ -540,7 +542,7 @@ describe('Factory', function () {
 
       return Promise.all([
         expect(noAttrsArrayP).to.be.eventually.fulfilled,
-        expect(arrayAttrsArrayP).to.be.eventually.fulfilled,
+        expect(arrayAttrsArrayP).to.be.eventually.rejected,
         expect(objectAttrsArrayP).to.be.eventually.fulfilled,
         expect(invalidAttrsArrayP).to.be.eventually.rejected,
       ]);
@@ -554,7 +556,7 @@ describe('Factory', function () {
 
       return Promise.all([
         expect(noBuildOptionsArrayP).to.be.eventually.fulfilled,
-        expect(arrayBuildOptionsArrayP).to.be.eventually.fulfilled,
+        expect(arrayBuildOptionsArrayP).to.be.eventually.rejected,
         expect(objectBuildOptionsArrayP).to.be.eventually.fulfilled,
         expect(invalidBuildOptionsArrayP).to.be.eventually.rejected,
       ]);
@@ -567,7 +569,7 @@ describe('Factory', function () {
       objFactory.attrs.restore();
     }));
 
-    it('passes same attrObject and buildOptionsObject for each model attr',
+    it('passes copy of attrObject and buildOptionsObject for each model attr',
       asyncFunction(async function () {
         const spy = sinon.spy(objFactory, 'attrs');
 
@@ -581,8 +583,8 @@ describe('Factory', function () {
         expect(spy).to.have.callCount(10);
 
         spy.args.forEach(function (argsArray) {
-          expect(argsArray[0]).to.be.equal(dummyAttrObject);
-          expect(argsArray[1]).to.be.equal(dummyBuildOptionsObject);
+          expect(argsArray[0]).to.be.eql(dummyAttrObject);
+          expect(argsArray[1]).to.be.eql(dummyBuildOptionsObject);
         });
 
         objFactory.attrs.restore();
