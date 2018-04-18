@@ -273,6 +273,35 @@ describe('Factory', function () {
       expect(model).to.be.an.instanceof(DummyModel);
     }));
 
+    it('invokes beforeCreate callback option if any',
+      asyncFunction(async function () {
+        const spy = sinon.spy(model => model);
+        const factoryWithOptions
+          = new Factory(DummyModel, simpleObjInit, { beforeCreate: spy });
+        const dummyAttrs = {};
+        const dummyBuildOptions = {};
+        const model = await factoryWithOptions.create(
+          dummyAdapter, dummyAttrs, dummyBuildOptions
+        );
+        expect(spy).to.have.been.calledWith(
+          model, dummyAttrs, dummyBuildOptions
+        );
+      })
+    );
+
+    it('accepts beforeCreate callback returning a promise',
+      asyncFunction(async function () {
+        const factoryWithOptions = new Factory(
+          DummyModel,
+          simpleObjInit,
+          { beforeCreate: model => Promise.resolve(model) }
+        );
+
+        const model = await factoryWithOptions.create(dummyAdapter);
+        expect(model).to.be.an.instanceof(DummyModel);
+      })
+    );
+
     it('invokes afterCreate callback option if any',
       asyncFunction(async function () {
         const spy = sinon.spy(model => model);

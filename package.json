@@ -52,7 +52,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "babelify": "^7.3.0",
-    "bluebird": "^2.9.25",
+    "bluebird": "^3.5.1",
     "bookshelf": "^0.10.0",
     "browserify": "^13.1.0",
     "chai": "^3.5.0",

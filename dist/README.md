@@ -114,6 +114,12 @@ Currently the supported options are:
 Provides a function that is called after the model is built.
 The function should return the instance or a Promise for the instance.
 
+#### `beforeCreate: function(model, attrs, buildOptions)`
+
+Provides a function that is called before a new model instance is saved. The function
+should return the instance or throw an error. For asynchronous functions, it should return
+a promise that resolves with the instance or rejects with the error.
+
 #### `afterCreate: function(model, attrs, buildOptions)`
 
 Provides a function that is called after a new model instance is saved. The function

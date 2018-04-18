@@ -54,8 +54,12 @@ export default class Factory {
   }
 
   async create(adapter, attrs = {}, buildOptions = {}) {
-    const model = await this.build(adapter, attrs, buildOptions);
-    return adapter.save(model, this.Model)
+    const buildModel = await this.build(adapter, attrs, buildOptions);
+    const beforeCreate = this.options.beforeCreate ?
+      this.options.beforeCreate(buildModel, attrs, buildOptions) : buildModel;
+
+    return Promise.resolve(beforeCreate)
+      .then(model => adapter.save(model, this.Model))
       .then(savedModel => (this.options.afterCreate ?
           this.options.afterCreate(savedModel, attrs, buildOptions) :
           savedModel
