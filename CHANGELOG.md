@@ -1,3 +1,7 @@
+## v7.1.0
+
+- Adding `afterAttrs`.
+
 ## v7.0.0
 
 - Refactored code internally so that `buildMany` and `createMany` call `build` and `create` respectively. Also, attrs

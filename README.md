@@ -109,6 +109,12 @@ factory.withOptions(options);
 
 Currently the supported options are:
 
+#### `afterAttrs: function(modelAttrs, attrs, buildOptions)`
+
+Provides a function that is called after the model attributes are generated.
+The function should return the attributes or a Promise for the attrs.
+
+
 #### `afterBuild: function(model, attrs, buildOptions)`
 
 Provides a function that is called after the model is built.

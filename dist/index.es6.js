@@ -204,9 +204,17 @@ var Factory = function () {
                 return asyncPopulate(modelAttrs, extraAttrs);
 
               case 9:
+                if (this.options.afterAttrs) {
+                  _context.next = 11;
+                  break;
+                }
+
                 return _context.abrupt('return', modelAttrs);
 
-              case 10:
+              case 11:
+                return _context.abrupt('return', this.options.afterAttrs(modelAttrs, extraAttrs, buildOptions));
+
+              case 12:
               case 'end':
                 return _context.stop();
             }

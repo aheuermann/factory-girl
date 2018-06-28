@@ -1,8 +1,8 @@
 # factory-girl-sync
 
-[![Build Status](https://travis-ci.org/aheuermann/factory-girl-sync.png)](https://travis-ci.org/aheuermann/factory-girl-sync)
+[![Build Status](https://travis-ci.org/aheuermann/factory-girl-sync.svg?branch=master)](https://travis-ci.org/aheuermann/factory-girl-sync)
 
-`factory-girl-sync` is a fork of [Factory\_girl](http://github.com/aexmachina/factory_girl) that runs synchronously.
+`factory-girl-sync` is a fork of [Factory-girl](https://github.com/aexmachina/factory-girl) that creates models synchronously.
 
 ## Installation
 
@@ -108,6 +108,12 @@ factory.withOptions(options);
 ```
 
 Currently the supported options are:
+
+#### `afterAttrs: function(modelAttrs, attrs, buildOptions)`
+
+Provides a function that is called after the model attributes are generated.
+The function should return the attributes or a Promise for the attrs.
+
 
 #### `afterBuild: function(model, attrs, buildOptions)`
 
