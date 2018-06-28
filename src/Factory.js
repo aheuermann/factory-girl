@@ -43,7 +43,11 @@ export default class Factory {
     await asyncPopulate(modelAttrs, filteredAttrs);
     await asyncPopulate(modelAttrs, extraAttrs);
 
-    return modelAttrs;
+    if (!this.options.afterAttrs) {
+      return modelAttrs;
+    }
+
+    return this.options.afterAttrs(modelAttrs, extraAttrs, buildOptions);
   }
 
   async build(adapter, extraAttrs = {}, buildOptions = {}, buildCallbacks = true) {
