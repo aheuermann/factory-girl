@@ -1,4 +1,4 @@
-## v7.1.0
+## v7.1.1
 
 - Adding `afterAttrs`.
 
